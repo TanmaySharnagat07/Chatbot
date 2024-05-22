@@ -14,6 +14,12 @@ export const Query = () => {
   const [expandedMetadata, setExpandedMetadata] = useState(null);
   const navigate = useNavigate();
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
   const getResponse = async () => {
     try {
       const client = await Client.connect("TusharsinghBaghel/MECL_RAG");
@@ -57,9 +63,9 @@ export const Query = () => {
   };
 
   const getPartAfterMetadata = (str) => {
-    const metadataIndex = str.indexOf("metadata");
+    const metadataIndex = str.indexOf("metadata=");
     if (metadataIndex !== -1) {
-      return str.substring(metadataIndex + "metadata".length).trim();
+      return str.substring(metadataIndex + "metadata=".length).trim();
     }
     return str;
   };
@@ -139,41 +145,46 @@ export const Query = () => {
                     <p>{query}</p>
                   </div>
                   <div className="w-full lg:w-[60%] p-4 lg:mr-12 bg-white dark:bg-gray-700 rounded-lg shadow">
-                    <div className="max-h-80 overflow-y-auto">
+                    <div className="h-72 overflow-y-auto">
                       <h2 className="text-xl font-semibold mb-2 text-[#5BAEFE]">
                         Answer
                       </h2>
-                      <p>{answer}</p>
+                      <p className="typewriter">{answer}</p>
                     </div>
                   </div>
+
                   <div className="w-full lg:w-[35%] p-4 mb-5 bg-white dark:bg-gray-700 rounded-lg shadow">
-                    <div className="max-h-80 overflow-y-auto">
+                    <div className="h-72 overflow-y-auto">
                       <details>
                         <summary className="text-xl font-semibold mb-2 text-[#3F2435]">
                           References
                         </summary>
-                        <ul className="list-disc pl-5">
-                          {context.length > 0 && (
-                            <div>
-                              <h3>Context:</h3>
-                              <ul>
-                                {context.map((contextItem, index) => (
-                                  <li key={index}>
-                                    <span onClick={() => toggleMetadata(index)} className="cursor-pointer text-gray-400">
-                                      <span className="font-bold text-black">{index+1}.</span>{getPartAfterMetadata(contextItem)}
-                                    </span>
-                                    {expandedMetadata === index && (
-                                      <div className="dropdown">
-                                        <h3>Page Content:</h3>
-                                        <p>{contextItem}</p>
-                                      </div>
-                                    )}
-                                  </li>
-                                ))}
-                              </ul>
+                        <div>
+                          {context.map((contextItem, index) => (
+                            <div
+                              key={index}
+                              className="mb-4 border-b border-gray-200 pb-4"
+                            >
+                              <div
+                                onClick={() => toggleMetadata(index)}
+                                className="cursor-pointer flex justify-between items-center text-gray-500"
+                              >
+                                <span className="font-bold text-black">
+                                  {index + 1}.
+                                </span>
+                                <span>{getPartAfterMetadata(contextItem)}</span>
+                              </div>
+                              {expandedMetadata === index && (
+                                <div className="mt-2">
+                                  <h3 className="font-semibold mb-1">
+                                    Page Content:
+                                  </h3>
+                                  <p>{contextItem}</p>
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </ul>
+                          ))}
+                        </div>
                       </details>
                     </div>
                   </div>
@@ -186,6 +197,7 @@ export const Query = () => {
                 placeholder="Enter your query"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleKeyPress} // Added this line to trigger search on Enter key press
                 className="h-12 text-black px-4 mt-4 w-full border-2 border-[#57A7FB] rounded-l-full focus:outline-none focus:border-[#2A1F3B]"
               />
               <button
