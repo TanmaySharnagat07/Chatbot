@@ -55,7 +55,7 @@ export const Banner = () => {
               <div className={isVisible ? "animate__animated animate__fadeIn" : ""}>
                 <span className="tagline">Welcome</span>
                 <h1>{`Hi! I'm Khanij`} <span className="txt-rotate" dataPeriod="1000" data-rotate='["Knowledge Explorer", "Data Explorer"]'><span className="wrap"> <span className="text-[#4AC8FB]">{text}</span> </span></span></h1>
-                  <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+                  <p>Your digital companion in the quest for uncovering valuable minerals. Whether you're a seasoned geologist or a curious novice, embark on a journey of discovery with us. Ask questions, seek guidance, and delve into the depths of mineral exploration expertise right here.</p>
               </div>}
             </TrackVisibility>
           </Col>

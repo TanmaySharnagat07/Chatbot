@@ -1,5 +1,6 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 export const Data = () => {
   const navigate = useNavigate();
   const [userInput, setUserInput] = useState("");
@@ -10,42 +11,47 @@ export const Data = () => {
     setResponse("Work in Progress");
     setShowResponse(true);
   };
+
   return (
     <>
-      <div className="flex w-screen h-screen bg-white">
-        <div className="w-full lg:w-1/2 flex items-center justify-center h-full">
-          <div className="h-full w-full bg-[#294457] bg-[length:200%_200%] flex items-center flex-col justify-center">
-            <h1 className="text-5xl font-bold mb-10 text-[#FFE177]">Data Mode</h1>
+      <div className="flex w-screen h-screen bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500">
+        <div className="w-full  flex items-center justify-center h-full">
+          <div className="h-full w-full bg-white bg-opacity-75 backdrop-filter backdrop-blur-lg flex items-center flex-col justify-center p-8 rounded-xl shadow-lg">
+            <h1 className="text-5xl font-extrabold mb-10 text-purple-700">Data Mode</h1>
             <input
               type="text"
               placeholder="Enter your query"
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
-              className="p-2 mb-4 w-full max-w-md border-2 border-blue-400 rounded-md focus:outline-none focus:border-blue-600"
+              className="p-3 text-gray-500 mb-6 w-full max-w-md border-2 border-purple-300 rounded-md focus:outline-none focus:border-purple-500 transition duration-300"
             />
             <button
               onClick={handleQuery}
-              className="py-2 px-4 mb-6 bg-[#FFE177] text-white font-semibold rounded-full shadow-lg hover:bg-yellow-600 transition duration-300"
+              className="py-3 px-6 mb-8 bg-purple-700 text-white font-semibold rounded-full shadow-lg hover:bg-purple-800 transition duration-300"
             >
               Submit
             </button>
             {showResponse && (
-              <div className="w-full max-w-md space-y-4">
-                <div className="p-4 bg-white rounded-lg shadow">
-                  <h2 className="text-xl font-semibold mb-2">Response</h2>
-                  <img className="h-[10rem] ml-28" src="https://i.ibb.co/25n9W8B/work-in-progress.png" alt="" />
+              <div className="w-full max-w-md bg-white bg-opacity-90 p-6 rounded-lg shadow-md space-y-4">
+                <h2 className="text-2xl font-semibold mb-4 text-purple-700">Response</h2>
+                <div className="flex justify-center items-center">
+                  <img
+                    className="h-28 w-40"
+                    src="https://i.ibb.co/25n9W8B/work-in-progress.png"
+                    alt="Work in Progress"
+                  />
                 </div>
+                <p className="text-gray-700 text-center">{response}</p>
               </div>
             )}
             <button
               onClick={() => navigate("/")}
-              className="mt-6 py-2 px-4 bg-gray-500 text-white font-semibold rounded-full shadow-lg hover:bg-gray-600 transition duration-300"
+              className="mt-8 py-3 px-6 bg-gray-700 text-white font-semibold rounded-full shadow-lg hover:bg-gray-800 transition duration-300"
             >
               Change Mode
             </button>
           </div>
         </div>
-        
       </div>
     </>
   );

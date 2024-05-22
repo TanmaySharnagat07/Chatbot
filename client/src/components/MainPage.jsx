@@ -3,10 +3,12 @@ import { NavBar } from "./NavBar";
 import { Banner } from "./Banner";
 import { Known } from "./Known";
 import { DExplorer } from "./DExplorer";
-
+import { CustomCursor } from "./Customize/CustomCursor";
 export const MainPage = () => {
   return (
-    <div className="App">
+    
+    <div className="App" >
+      <CustomCursor />
       <NavBar />
       <section id="home">
         <Banner />
