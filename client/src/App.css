@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 
 /************ Custom Font ************/
 
@@ -39,6 +37,7 @@
     background-color: #121212 !important;
     color: #fff !important;
     font-family: "Centra", sans-serif !important;
+    cursor: none;
   }
   
   h1,
@@ -274,7 +273,7 @@
     background-size: cover;
     background-repeat: no-repeat;
   }
-  .banner .tagline {
+  .banner .tagline{
     font-weight: 700;
     letter-spacing: 0.8px;
     padding: 8px 10px;
@@ -287,6 +286,7 @@
     font-size: 20px;
     margin-bottom: 16px;
     display: inline-block;
+    margin-left: 20px;
   }
   .banner h1 {
     font-size: 65px;
@@ -294,6 +294,7 @@
     letter-spacing: 0.8px;
     line-height: 1;
     margin-bottom: 20px;
+    margin-left: 20px;
     display: block;
   }
   .banner p {
@@ -301,6 +302,7 @@
     font-size: 18px;
     letter-spacing: 0.8px;
     line-height: 1.5em;
+    margin-left: 20px;
     width: 96%;
   }
   .banner button {
@@ -337,4 +339,30 @@
   }
   .txt-rotate > .wrap {
     border-right: 0.08em solid #666;
+  }
+
+
+  #queryMode{
+    background-image: url('./assets/img/banner-bg.png');
+  }
+
+  #kExp{
+    background-image: url('./assets/img/knowBack.jpg');
+  }
+  #dExp{
+    background-image: url('./assets/img/39.jpg');
+  }
+
+  #titleOfQuery {
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    padding: 8px 10px;
+    background: linear-gradient(
+      90.21deg,
+      #282146 -5.91%,
+      #000000 111.58%
+    );
+    border: 1px solid rgba(122, 89, 89, 0.5);
+    margin-bottom: 16px;
+    display: inline-block;
   }
