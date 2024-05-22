@@ -354,7 +354,7 @@
   }
 
   #titleOfQuery {
-    font-weight: 900;
+   /*font-weight: 900;
     letter-spacing: 0.8px;
     padding: 8px 10px;
     background: linear-gradient(
@@ -364,5 +364,7 @@
     );
     border: 1px solid rgba(122, 89, 89, 0.5);
     margin-bottom: 16px;
-    display: inline-block;
+    display: inline-block; */
+      -webkit-text-fill-color: transparent;
+    -webkit-text-stroke-width: 2px;
   }
