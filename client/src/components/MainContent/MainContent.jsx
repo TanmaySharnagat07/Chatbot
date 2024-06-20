@@ -5,8 +5,56 @@ import "./MainContent.css";
 import { DataContext } from "../Context/Context";
 import { MapComponent } from "../MapComponent";
 import { CodePlayground } from "../CodePlayground";
-
+import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 export const MainContent = () => {
+  const handleDownloadPDF = async () => {
+    const doc = new jsPDF("landscape"); // Set the PDF to landscape mode
+
+    // Render message on the first page
+    const messageLines = doc.splitTextToSize(`Message: ${message}`, 280); // Adjusted for landscape width
+    doc.text(messageLines, 10, 10);
+
+    // Add a new page for the HTML content
+    doc.addPage();
+
+    // Create an iframe to render the full HTML content
+    const iframe = document.createElement("iframe");
+    document.body.appendChild(iframe);
+    iframe.style.position = "absolute";
+    iframe.style.top = "-10000px";
+    iframe.style.width = "1000px";
+    iframe.style.height = "500px";
+
+    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    iframeDoc.open();
+    iframeDoc.write(htmlContent); // Assuming htmlContent contains full HTML including the map
+    iframeDoc.close();
+
+    // Wait for the iframe to load content
+    iframe.onload = async () => {
+      try {
+        const canvas = await html2canvas(iframeDoc.body, { scale: 2 });
+
+        const imgData = canvas.toDataURL("image/png");
+        const imgWidth = 297;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        doc.addImage(imgData, "PNG", 10, 10, imgWidth - 20, imgHeight);
+
+        doc.save("result.pdf");
+
+        document.body.removeChild(iframe);
+      } catch (error) {
+        console.error("Error generating PDF:", error);
+        alert("Failed to generate PDF. Please try again.");
+
+        // Clean up the iframe in case of error
+        document.body.removeChild(iframe);
+      }
+    };
+  };
+
   const {
     query,
     latMin,
@@ -79,11 +127,11 @@ export const MainContent = () => {
 
     setLoading(true);
     setShowResult(true);
-    setError(true);
+    setError(null);
 
     try {
       const res = await getResponse();
-      console.log(res)
+      console.log(res);
       const newEntry = {
         query: query,
         latMin: latMinValue,
@@ -98,8 +146,10 @@ export const MainContent = () => {
       }
       setHtmlContent(newEntry.htmlContent);
       setMessage(newEntry.message);
+
       updateSearchHistory([newEntry, ...searchHistory]);
       setResultsHistory([...resultsHistory, newEntry]);
+
       setShowResult(true);
       setQuery("");
     } catch (error) {
@@ -118,6 +168,15 @@ export const MainContent = () => {
     setInputLatMax("");
     setInputLonMin("");
     setInputLonMax("");
+  };
+
+  const renderWithLineBreaks = (text) => {
+    return text.split("\n").map((item, index) => (
+      <span key={index}>
+        {item}
+        <br />
+      </span>
+    ));
   };
 
   return (
@@ -144,29 +203,36 @@ export const MainContent = () => {
                     <div key={index} className="result-section">
                       <div className="result-title">
                         <img src={assets.user} alt="" />
-                        <p className="text-white">{entry.query}</p>
+                        <div className="query-box">
+                          <p>{entry.query}</p>
+                        </div>
                       </div>
                       <div className="result-data">
-                        <p>{entry.message}</p>
+                        <p>{renderWithLineBreaks(entry.message)}</p>
                         {entry.htmlContent ? (
                           <>
                             <div className="code-display">
-                              <div class="text">
-                                <div class="border-text top">North</div>
-                                <div class="border-text bottom">South</div>
-                                <div class="border-text left">West</div>
-                                <div class="border-text right">East</div>
+                              <div className="text">
+                                <div className="border-text top">North</div>
+                                <div className="border-text bottom">South</div>
+                                <div className="border-text left">West</div>
+                                <div className="border-text right">East</div>
                               </div>
-                              <div class="content">
-                                <div>
+                              <div className="content">
+                                <div id="html-content">
                                   <CodePlayground
                                     initialCode={entry.htmlContent}
                                   />
                                 </div>
                               </div>
                             </div>
+                            <button onClick={handleDownloadPDF}>
+                              Download PDF
+                            </button>
                           </>
-                        ) : null}
+                        ) : (
+                          <p className="text-sm text-red-400">No Maps</p>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -192,7 +258,7 @@ export const MainContent = () => {
                   updateRectangleCoordinates={updateRectangleCoordinates}
                 />
               </div>
-              <div className="flex justify-center mb-0">
+              <div className="flex justify-center">
                 <p>OR</p>
               </div>
               <div>
