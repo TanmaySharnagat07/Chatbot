@@ -12,17 +12,25 @@
   "dependencies": {
     "@popperjs/core": "^2.11.8",
     "@preline/accordion": "^2.1.0",
+    "@react-google-maps/api": "^2.19.3",
+    "@vis.gl/react-google-maps": "^1.0.2",
     "bootstrap": "^5.3.3",
     "flowbite": "^2.3.0",
     "flowbite-react": "^0.9.0",
+    "leaflet": "^1.9.4",
+    "leaflet-draw": "^1.0.4",
     "preline": "^2.1.0",
     "react": "^18.2.0",
     "react-animations": "^1.0.0",
     "react-bootstrap": "^2.10.2",
     "react-dom": "^18.2.0",
+    "react-html-parser": "^2.0.2",
+    "react-leaflet": "^4.2.1",
+    "react-leaflet-draw": "^0.20.4",
     "react-on-screen": "^2.1.1",
     "react-router-dom": "^6.23.1",
-    "react-scroll": "^1.9.0"
+    "react-scroll": "^1.9.0",
+    "styled-components": "^6.1.11"
   },
   "devDependencies": {
     "@gradio/client": "^0.19.3",

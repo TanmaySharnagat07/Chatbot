@@ -43,9 +43,14 @@ export const Query = () => {
 
     try {
       const res = await getResponse();
-      setAnswer(res.data[0].answer);
-      setContext(res.data[0].context);
-      setHistory((prevHistory) => [query, ...prevHistory]);
+      const newEntry = {
+        query: query,
+        answer: res.data[0].answer,
+        context: res.data[0].context
+      };
+      setAnswer(newEntry.answer);
+      setContext(newEntry.context);
+      setHistory((prevHistory) => [newEntry, ...prevHistory]);
       setShowResult(true);
     } catch (error) {
       setError("Failed to fetch data. Please try again.");
@@ -68,6 +73,13 @@ export const Query = () => {
       return str.substring(metadataIndex + "metadata=".length).trim();
     }
     return str;
+  };
+
+  const handleHistoryItemClick = (selectedEntry) => {
+    setQuery(selectedEntry.query); // Set the selected query from history to the input field
+    setAnswer(selectedEntry.answer);
+    setContext(selectedEntry.context);
+    setShowResult(true); // Show the result for the selected query
   };
 
   return (
@@ -100,8 +112,15 @@ export const Query = () => {
             <div>
               <h3 className="text-xl font-semibold mb-2">Search History</h3>
               <ul className="list-disc pl-5">
-                {history.map((item, index) => (
-                  <li key={index}>{item}</li>
+                {history.map((entry, index) => (
+                  <li key={index}>
+                    <button
+                      onClick={() => handleHistoryItemClick(entry)}
+                      className="text-blue-400 hover:underline focus:outline-none"
+                    >
+                      {entry.query}
+                    </button>
+                  </li>
                 ))}
               </ul>
             </div>
@@ -197,7 +216,7 @@ export const Query = () => {
                 placeholder="Enter your query"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                onKeyDown={handleKeyPress} // Added this line to trigger search on Enter key press
+                onKeyDown={handleKeyPress}
                 className="h-12 text-black px-4 mt-4 w-full border-2 border-[#57A7FB] rounded-l-full focus:outline-none focus:border-[#2A1F3B]"
               />
               <button
