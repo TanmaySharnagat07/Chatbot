@@ -15,6 +15,9 @@ import code_icon from './code_icon.png'
 import send_icon from './send_icon.png'
 import gemini_icon from './gemini_icon.png'
 import back_icon from './back_icon.png'
+import mineralExploration from './mineralExploration.png'
+import combine_icon from './combine_icon.png'
+
 export const assets = {
 	history_icon,
 	menu_icon,
@@ -33,4 +36,6 @@ export const assets = {
 	gemini_icon,
 	user,
 	back_icon,
+	mineralExploration, 
+	combine_icon,
 };

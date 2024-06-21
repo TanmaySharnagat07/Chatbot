@@ -1,58 +1,50 @@
-import React, { useContext, useState, useEffect } from "react";
+import React, { useContext, useState, useEffect, useRef } from "react";
 import { Client } from "@gradio/client";
 import { assets } from "../../assets/img/assets";
 import "./MainContent.css";
 import { DataContext } from "../Context/Context";
 import { MapComponent } from "../MapComponent";
 import { CodePlayground } from "../CodePlayground";
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+
 export const MainContent = () => {
+  const [hoverText, setHoverText] = useState("");
+
+  const handleMouseEnter = (altText) => {
+    setHoverText(altText);
+  };
+
+  const handleMouseLeave = () => {
+    setHoverText("");
+  };
+
   const handleDownloadPDF = async () => {
-    const doc = new jsPDF("landscape"); // Set the PDF to landscape mode
+    const doc = new jsPDF("p", "mm", "a4");
 
-    // Render message on the first page
-    const messageLines = doc.splitTextToSize(`Message: ${message}`, 280); // Adjusted for landscape width
-    doc.text(messageLines, 10, 10);
+    doc.setFontSize(16);
+    doc.text(`Area Statistics:`, 10, 10);
+    doc.setFontSize(12);
+    const messageLines = doc.splitTextToSize(message, 180);
+    doc.text(messageLines, 10, 20);
 
-    // Add a new page for the HTML content
-    doc.addPage();
+    const lineHeight = doc.getLineHeight();
+    const lastMessageY =
+      messageLines.length > 0 ? messageLines.length * lineHeight +120 : 20;
 
-    // Create an iframe to render the full HTML content
-    const iframe = document.createElement("iframe");
-    document.body.appendChild(iframe);
-    iframe.style.position = "absolute";
-    iframe.style.top = "-10000px";
-    iframe.style.width = "1000px";
-    iframe.style.height = "500px";
+    const htmlContentLink = `Click here to view the interactive map`;
+    doc.setTextColor(0, 0, 255);
+    doc.textWithLink(htmlContentLink, 10, lastMessageY + 10, {
+      url: generateHtmlContentLink(),
+    });
 
-    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-    iframeDoc.open();
-    iframeDoc.write(htmlContent); // Assuming htmlContent contains full HTML including the map
-    iframeDoc.close();
+    doc.save("result.pdf");
+  };
 
-    // Wait for the iframe to load content
-    iframe.onload = async () => {
-      try {
-        const canvas = await html2canvas(iframeDoc.body, { scale: 2 });
+  const generateHtmlContentLink = () => {
+  
+    const file = new Blob([htmlContent], { type: "text/html" });
 
-        const imgData = canvas.toDataURL("image/png");
-        const imgWidth = 297;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-        doc.addImage(imgData, "PNG", 10, 10, imgWidth - 20, imgHeight);
-
-        doc.save("result.pdf");
-
-        document.body.removeChild(iframe);
-      } catch (error) {
-        console.error("Error generating PDF:", error);
-        alert("Failed to generate PDF. Please try again.");
-
-        // Clean up the iframe in case of error
-        document.body.removeChild(iframe);
-      }
-    };
+    return URL.createObjectURL(file);
   };
 
   const {
@@ -85,6 +77,16 @@ export const MainContent = () => {
   const [inputLatMax, setInputLatMax] = useState("");
   const [inputLonMin, setInputLonMin] = useState("");
   const [inputLonMax, setInputLonMax] = useState("");
+  const [selectedMaps, setSelectedMaps] = useState([]);
+  const [combinedHtmlContent, setCombinedHtmlContent] = useState("");
+
+  const resultRef = useRef(null);
+
+  const scrollToBottom = () => {
+    if (resultRef.current) {
+      resultRef.current.scrollTop = resultRef.current.scrollHeight;
+    }
+  };
 
   const getResponse = async () => {
     try {
@@ -131,7 +133,7 @@ export const MainContent = () => {
 
     try {
       const res = await getResponse();
-      console.log(res);
+      // console.log(res);
       const newEntry = {
         query: query,
         latMin: latMinValue,
@@ -157,6 +159,7 @@ export const MainContent = () => {
     } finally {
       setLoading(false);
     }
+    scrollToBottom();
   };
 
   const updateRectangleCoordinates = ({ latMin, latMax, lonMin, lonMax }) => {
@@ -170,6 +173,32 @@ export const MainContent = () => {
     setInputLonMax("");
   };
 
+  const handleMapSelection = (index) => {
+    if (selectedMaps.includes(index)) {
+      setSelectedMaps(selectedMaps.filter((i) => i !== index));
+    } else {
+      setSelectedMaps([...selectedMaps, index]);
+    }
+  };
+
+  const combineSelectedMaps = () => {
+    const combinedContent = selectedMaps
+      .map((index) => resultsHistory[index].htmlContent)
+      .join("");
+    setCombinedHtmlContent(combinedContent);
+    const newEntry = {
+      query: "Combined Map of query 1:" + resultsHistory[0].query + " and query 2:" + resultsHistory[1].query,
+      latMin: resultsHistory[selectedMaps[0]].latMin,
+      latMax: resultsHistory[selectedMaps[0]].latMax,
+      lonMin: resultsHistory[selectedMaps[0]].lonMin,
+      lonMax: resultsHistory[selectedMaps[0]].lonMax,
+      htmlContent: combinedContent,
+      message: "This is a combined map.",
+    };
+    setResultsHistory([...resultsHistory, newEntry]);
+    setSelectedMaps([]);
+  };
+
   const renderWithLineBreaks = (text) => {
     return text.split("\n").map((item, index) => (
       <span key={index}>
@@ -178,6 +207,8 @@ export const MainContent = () => {
       </span>
     ));
   };
+
+ 
 
   return (
     <>
@@ -198,13 +229,25 @@ export const MainContent = () => {
                   </div>
                 </>
               ) : (
-                <div className="result">
+                <div className="result" ref={resultRef}>
+                  
                   {resultsHistory.map((entry, index) => (
                     <div key={index} className="result-section">
                       <div className="result-title">
-                        <img src={assets.user} alt="" />
-                        <div className="query-box">
-                          <p>{entry.query}</p>
+                        <div className="flex gap-4">
+                          <img src={assets.user} alt="" className="h-10 mt-2" />
+                          <div className="query-box">
+                            <p>{entry.query}</p>
+                          </div>
+                        </div>
+                        <div className="overlay-div">
+                          <input
+                            type="checkbox"
+                            checked={selectedMaps.includes(index)}
+                            onChange={() => handleMapSelection(index)}
+                            className="text-xl"
+                          />
+                          Select for overlay
                         </div>
                       </div>
                       <div className="result-data">
@@ -212,22 +255,14 @@ export const MainContent = () => {
                         {entry.htmlContent ? (
                           <>
                             <div className="code-display">
-                              <div className="text">
-                                <div className="border-text top">North</div>
-                                <div className="border-text bottom">South</div>
-                                <div className="border-text left">West</div>
-                                <div className="border-text right">East</div>
-                              </div>
-                              <div className="content">
-                                <div id="html-content">
-                                  <CodePlayground
-                                    initialCode={entry.htmlContent}
-                                  />
-                                </div>
-                              </div>
+                              <CodePlayground initialCode={entry.htmlContent} />
                             </div>
-                            <button onClick={handleDownloadPDF}>
-                              Download PDF
+
+                            <button
+                              onClick={handleDownloadPDF}
+                              className="download-btn"
+                            >
+                              Download Now
                             </button>
                           </>
                         ) : (
@@ -316,8 +351,35 @@ export const MainContent = () => {
                   }
                 }}
               />
-              <div onClick={handleSearch}>
-                <img src={assets.send_icon} alt="Send" />
+              <div className="mr-3 icon-wrapper">
+                <img
+                  src={assets.combine_icon}
+                  alt="Overlay"
+                  onMouseEnter={() => handleMouseEnter("Overlay")}
+                  onMouseLeave={handleMouseLeave}
+                  onClick={combineSelectedMaps}
+                  style={{
+                    opacity: selectedMaps.length < 2 ? 0.5 : 1,
+                    cursor: "pointer",
+                  }}
+                  disabled={selectedMaps.length < 2}
+                />
+                {hoverText === "Overlay" && (
+                  <div className="hover-popup">{hoverText}</div>
+                )}
+              </div>
+              <div className="icon-wrapper">
+                <img
+                  src={assets.send_icon}
+                  alt="Send"
+                  onMouseEnter={() => handleMouseEnter("Send")}
+                  onMouseLeave={handleMouseLeave}
+                  style={{ cursor: "pointer" }}
+                  onClick={handleSearch}
+                />
+                {hoverText === "Send" && (
+                  <div className="hover-popup">{hoverText}</div>
+                )}
               </div>
             </div>
           </div>

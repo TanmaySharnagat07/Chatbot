@@ -30,7 +30,7 @@ export const Sidebar = () => {
   const navigate = useNavigate();
   return (
     <>
-      <div className="sidebar" >
+      <div className="sidebar">
         <div className="top">
           <img
             src={assets.menu_icon}
@@ -41,10 +41,10 @@ export const Sidebar = () => {
             }}
           />
           <div className="new-chat" onClick={newChat}>
-            <img src={assets.plus_icon} alt=""  />
+            <img src={assets.plus_icon} alt="" />
             {extended && <p>New Chat</p>}
           </div>
-          <div className="back" onClick={()=> navigate("/")}>
+          <div className="back" onClick={() => navigate("/")}>
             <img src={assets.back_icon} alt="" />
             {extended && <p>Back</p>}
           </div>
@@ -53,7 +53,7 @@ export const Sidebar = () => {
               <p className="recent-title">History</p>
               <ul className="search-history">
                 {searchHistory.map((item, index) => (
-                  <li key={index} onClick={() => handleHistoryClick(item)}>
+                  <li key={index} className="history-item" onClick={() => handleHistoryClick(item)}>
                     {item.query}
                   </li>
                 ))}

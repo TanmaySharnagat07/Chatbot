@@ -46,7 +46,7 @@ export const Query = () => {
       const newEntry = {
         query: query,
         answer: res.data[0].answer,
-        context: res.data[0].context
+        context: res.data[0].context,
       };
       setAnswer(newEntry.answer);
       setContext(newEntry.context);
@@ -57,6 +57,7 @@ export const Query = () => {
     } finally {
       setLoading(false);
     }
+    setQuery("");
   };
 
   const toggleSidebar = () => {
@@ -68,18 +69,30 @@ export const Query = () => {
   };
 
   const getPartAfterMetadata = (str) => {
+    // Find the start of metadata
     const metadataIndex = str.indexOf("metadata=");
     if (metadataIndex !== -1) {
-      return str.substring(metadataIndex + "metadata=".length).trim();
+      // Extract the metadata substring
+      const metadataSubstring = str
+        .substring(metadataIndex + "metadata=".length)
+        .trim();
+
+      // Replace single quotes with double quotes to make it valid JSON
+      const metadataJSON = metadataSubstring.replace(/'/g, '"');
+
+      // Parse the metadata JSON into an object
+      const metadataObj = JSON.parse(metadataJSON);
+
+      return metadataObj; // Return the parsed metadata object
     }
-    return str;
+    return null;
   };
 
   const handleHistoryItemClick = (selectedEntry) => {
     setQuery(selectedEntry.query); // Set the selected query from history to the input field
     setAnswer(selectedEntry.answer);
     setContext(selectedEntry.context);
-    setShowResult(true); // Show the result for the selected query
+    setShowResult(true);
   };
 
   return (
@@ -163,50 +176,81 @@ export const Query = () => {
                     </h2>
                     <p>{query}</p>
                   </div>
-                  <div className="w-full lg:w-[60%] p-4 lg:mr-12 bg-white dark:bg-gray-700 rounded-lg shadow">
-                    <div className="h-72 overflow-y-auto">
-                      <h2 className="text-xl font-semibold mb-2 text-[#5BAEFE]">
-                        Answer
-                      </h2>
-                      <p className="typewriter">{answer}</p>
-                    </div>
-                  </div>
-
-                  <div className="w-full lg:w-[35%] p-4 mb-5 bg-white dark:bg-gray-700 rounded-lg shadow">
-                    <div className="h-72 overflow-y-auto">
-                      <details>
-                        <summary className="text-xl font-semibold mb-2 text-[#3F2435]">
-                          References
-                        </summary>
-                        <div>
-                          {context.map((contextItem, index) => (
-                            <div
-                              key={index}
-                              className="mb-4 border-b border-gray-200 pb-4"
-                            >
-                              <div
-                                onClick={() => toggleMetadata(index)}
-                                className="cursor-pointer flex justify-between items-center text-gray-500"
-                              >
-                                <span className="font-bold text-black">
-                                  {index + 1}.
-                                </span>
-                                <span>{getPartAfterMetadata(contextItem)}</span>
-                              </div>
-                              {expandedMetadata === index && (
-                                <div className="mt-2">
-                                  <h3 className="font-semibold mb-1">
-                                    Page Content:
-                                  </h3>
-                                  <p>{contextItem}</p>
-                                </div>
-                              )}
-                            </div>
-                          ))}
+                  {loading ? (
+                    <>
+                      <div className="loader">
+                        <hr />
+                        <hr />
+                        <hr />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="w-full lg:w-[60%] p-4 lg:mr-12 bg-white dark:bg-gray-700 rounded-lg shadow">
+                        <div className="h-72 overflow-y-auto">
+                          <h2 className="text-xl font-semibold mb-2 text-[#5BAEFE]">
+                            Answer
+                          </h2>
+                          <p className="typewriter">{answer}</p>
                         </div>
-                      </details>
-                    </div>
-                  </div>
+                      </div>
+
+                      <div className="w-full lg:w-[35%] p-4 mb-5 bg-white dark:bg-gray-700 rounded-lg shadow">
+                        <div className="h-72 overflow-y-auto">
+                          <details>
+                            <summary className="text-xl font-semibold mb-2 text-[#3F2435]">
+                              References
+                            </summary>
+                            <div>
+                              {context.map((contextItem, index) => {
+                                const metadata =
+                                  getPartAfterMetadata(contextItem);
+                                return (
+                                  <div
+                                    key={index}
+                                    className="mb-4 border-b border-gray-200 pb-4"
+                                  >
+                                    <div
+                                      onClick={() => toggleMetadata(index)}
+                                      className="cursor-pointer flex justify-between items-center text-gray-500"
+                                    >
+                                      <span className="font-bold text-black">
+                                        {index + 1}.
+                                      </span>
+                                      <div className="dropdown">
+                                        <button className="dropbtn font-bold">
+                                          Source
+                                        </button>
+                                        <div className="dropdown-content">
+                                          <p>{metadata.source}</p>
+                                        </div>
+                                      </div>
+                                      <div className="dropdown">
+                                        <button className="dropbtn font-bold">
+                                          Page
+                                        </button>
+                                        <div className="dropdown-content">
+                                          <p>{metadata.page}</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                    {expandedMetadata === index && (
+                                      <div className="mt-2">
+                                        <h3 className="font-semibold mb-1">
+                                          Page Content:
+                                        </h3>
+                                        <p>{contextItem}</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                );
+                              })}
+                            </div>
+                          </details>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>

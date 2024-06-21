@@ -5,19 +5,23 @@
   justify-content: space-between;
   background-color: rgb(43, 43, 43);
   padding: 10px 15px;
-  max-width: 13vw;
+  max-width: 15vw;
 }
+
 .sidebar .top {
   margin-top: 15px;
 }
+
 .sidebar img {
   width: 20px;
 }
+
 .sidebar .menu {
   display: block;
   margin-left: 10px;
   cursor: pointer;
 }
+
 .sidebar .new-chat {
   margin-top: 50px;
   display: flex;
@@ -32,7 +36,8 @@
   cursor: pointer;
   max-width: 92px;
 }
-.sidebar .back{
+
+.sidebar .back {
   display: inline-flex;
   align-items: center;
   height: 50px;
@@ -45,43 +50,85 @@
   cursor: pointer;
   margin-top: 10px;
 }
+
 .sidebar .recent {
   display: flex;
   flex-direction: column;
   animation: fadeIn 2s;
   color: white;
   animation: fadeIn 1.5s;
+  max-height: 50vh; 
+  overflow-y: auto; 
+  border: 1px solid #ccc; 
+  background-color: rgb(79, 74, 74);
 }
+
+.sidebar .recent::-webkit-scrollbar {
+  display: none;
+}
+.sidebar .recent {
+  -ms-overflow-style: none;
+  scrollbar-width: none; 
+}
+
 .sidebar .recent-title {
-  margin-top: 30px;
-  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding-right: 10px;
 }
-.sidebar .recent-entry {
-  display: flex;
-  align-items: start;
-  gap: 10px;
+
+.sidebar .search-history {
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0; 
+}
+
+.sidebar .history-item {
   padding: 10px;
-  padding-right: 40px;
-  border-radius: 50px;
-  color: #282828;
+  border-bottom: 1px solid #ccc;
   cursor: pointer;
 }
-.sidebar .recent-entry:hover {
-  background-color: #e2e6eb;
+
+.sidebar .history-item:hover {
+  color: rgb(59, 59, 237);
 }
+
 .sidebar .bottom {
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
+
 .sidebar .bottom-item {
   padding-right: 10px;
   cursor: pointer;
   color: white;
+  display: flex;
 }
 
 @media (max-width: 600px) {
-  .sidebar{
+  .sidebar {
+    max-width: 90vw;
+    padding: 10px 5px;
+  }
 
+  .sidebar .new-chat,
+  .sidebar .back {
+    max-width: 100%;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  .sidebar .recent {
+    max-height: 40vh;
+  }
+
+  .sidebar .history-item {
+    font-size: 12px;
+  }
+
+  .sidebar .bottom-item {
+    font-size: 12px;
   }
 }
 
@@ -90,7 +137,11 @@
 }
 
 .recent-title {
-  margin-bottom: 5px;
+  -webkit-text-stroke-width: 1px;
+  font-size: 30px;
+  font-weight: bolder;
+  color: rgb(250, 240, 96);
+  margin-left: 10px;
 }
 
 .search-history {
